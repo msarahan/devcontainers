@@ -109,6 +109,8 @@ init_github_cli() {
     fi
 
     export GITHUB_USER="${github_user:-}";
+
+    git config credential.helper '!f() { sleep 1; echo "username=${GITHUB_USER:-oauth2}"; echo "password=${GITHUB_TOKEN:-}"; }; f'
 }
 
 init_github_cli "$@";

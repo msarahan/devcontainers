@@ -56,6 +56,8 @@ init_gitlab_cli() {
     fi
 
     export GITLAB_USER="${gitlab_user:-}";
+
+    git config credential.helper '!f() { sleep 1; echo "username=${GITLAB_USER:-oauth2}"; echo "password=${GITLAB_TOKEN:-}"; }; f'
 }
 
 init_gitlab_cli "$@";
