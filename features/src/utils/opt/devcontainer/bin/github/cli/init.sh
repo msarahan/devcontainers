@@ -110,11 +110,7 @@ init_github_cli() {
 
     export GITHUB_USER="${github_user:-}";
 
-    cat <<EOF >>~/.gitconfig
-[credential "https://${GITHUB_HOST:-github.com}"]
-    username = ${GITHUB_USER:-oauth2}
-    helper = !f() { sleep 1; echo "password=${GITHUB_TOKEN:-}"; }; f
-EOF
+    git config url."https://${GITHUB_USER:-oauth2}:${GITHUB_TOKEN:-}@${GITHUB_HOST:-github.com}".insteadOf "https://${GITHUB_HOST:-github.com}"
 }
 
 init_github_cli "$@";
