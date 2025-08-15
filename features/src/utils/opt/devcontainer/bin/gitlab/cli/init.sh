@@ -57,7 +57,8 @@ init_gitlab_cli() {
 
     export GITLAB_USER="${gitlab_user:-}";
 
-    git config --global url."https://${GITLAB_USER:-oauth2}:${GITLAB_TOKEN:-}@${GITLAB_HOST:-gitlab.com}".insteadOf "https://${GITLAB_HOST:-gitlab.com}"
+    # git config --global url."https://${GITLAB_USER:-oauth2}:${GITLAB_TOKEN:-}@${GITLAB_HOST:-gitlab.com}".insteadOf "https://${GITLAB_HOST:-gitlab.com}"
+    git config --global credential."https://${GITLAB_HOST:-gitlab.com}".helper '!f() { sleep 1; echo "username=${GITLAB_USER:-oauth2}"; echo "password=${GITLAB_TOKEN:-}"; }; f'
 EOF
 }
 

@@ -195,6 +195,8 @@ clone_gitlab_repo() {
         fi
     fi
 
+    git config -l
+
     devcontainer-utils-clone-git-repo          \
         ${branch:+--branch "${branch}"}        \
         ${upstream:+--upstream "${upstream_}"} \

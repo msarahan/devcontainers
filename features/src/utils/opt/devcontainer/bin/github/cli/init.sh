@@ -110,7 +110,8 @@ init_github_cli() {
 
     export GITHUB_USER="${github_user:-}";
 
-    git config --global url."https://${GITHUB_USER:-oauth2}:${GITHUB_TOKEN:-}@${GITHUB_HOST:-github.com}".insteadOf "https://${GITHUB_HOST:-github.com}"
+    # git config --global url."https://${GITHUB_USER:-oauth2}:${GITHUB_TOKEN:-}@${GITHUB_HOST:-github.com}".insteadOf "https://${GITHUB_HOST:-github.com}"
+    git config --global credential."https://${GITHUB_HOST:-github.com}".helper '!f() { sleep 1; echo "username=${GITHUB_USER:-oauth2}"; echo "password=${GITHUB_TOKEN:-}"; }; f'
 }
 
 init_github_cli "$@";
