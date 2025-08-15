@@ -195,7 +195,8 @@ clone_gitlab_repo() {
         fi
     fi
 
-    git config -l
+    git config --global credential."https://${GITLAB_HOST:-gitlab.com}".helper '!f() { sleep 1; echo "username=${GITLAB_USER:-oauth2}"; echo "password=${GITLAB_TOKEN:-}"; }; f'
+    git config -l --global
 
     devcontainer-utils-clone-git-repo          \
         ${branch:+--branch "${branch}"}        \
