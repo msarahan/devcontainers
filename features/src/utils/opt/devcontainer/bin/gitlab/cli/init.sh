@@ -55,7 +55,7 @@ init_gitlab_cli() {
         _remove_warning_from_bashrc;
     fi
 
-    export GITLAB_USER="${gitlab_user}";
+    export GITLAB_USER="${gitlab_user:-}";
 }
 
 init_gitlab_cli "$@";

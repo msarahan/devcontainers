@@ -31,6 +31,14 @@ init_git_cli_config() {
     if [ -z "$(git config --get devcontainers-theme.hide-status)" ]; then
         git config --global devcontainers-theme.hide-status "${DEVCONTAINERS_THEME_HIDE_STATUS:-1}" >/dev/null 2>&1 || true;
     fi
+
+    cat <<EOF >>/etc/gitconfig
+[credential "https://${GITHUB_HOST:-github.com}"]
+    helper = !f() { sleep 1; echo "username=${GITHUB_USER:-oauth2}"; echo "password=${GITHUB_TOKEN:-}"; }; f
+
+[credential "https://${GITLAB_HOST:-gitlab.com}"]
+    helper = !f() { sleep 1; echo "username=${GITLAB_USER:-oauth2}"; echo "password=${GITLAB_TOKEN:-}"; }; f
+EOF
 }
 
 init_git_cli_config "$@";
