@@ -32,7 +32,7 @@ init_git_cli_config() {
         git config --global devcontainers-theme.hide-status "${DEVCONTAINERS_THEME_HIDE_STATUS:-1}" >/dev/null 2>&1 || true;
     fi
 
-    cat <<EOF >>/etc/gitconfig
+    cat <<EOF >>~/.gitconfig
 [credential "https://${GITHUB_HOST:-github.com}"]
     helper = !f() { sleep 1; echo "username=${GITHUB_USER:-oauth2}"; echo "password=${GITHUB_TOKEN:-}"; }; f
 
