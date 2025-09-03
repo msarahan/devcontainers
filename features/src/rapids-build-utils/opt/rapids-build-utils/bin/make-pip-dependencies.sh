@@ -31,6 +31,8 @@ _generate_requirements_txt() {
      | grep -v '^#' 2>/dev/null \
      | tee "$file" 1>/dev/null; then
         echo "$file"
+      echo "########################${file} contents - requirements.txt####################" 1>&2;
+      cat "${file}" 1>&2;
     fi
 }
 
@@ -130,6 +132,7 @@ _generate_requirements_txts() {
 _make_pip_dependencies() {
     local -;
     set -euo pipefail;
+
 
     eval "$(_parse_args --skip '-m,--manifest -o,--omit --repo' "$@" <&0)";
 
