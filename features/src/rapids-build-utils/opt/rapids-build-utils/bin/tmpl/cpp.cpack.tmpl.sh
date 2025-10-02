@@ -10,9 +10,7 @@
 # @_include_bool_options rapids-select-cmake-install-args -h | tail -n-3 | head -n-1;
 #
 # Options that require values:
-#  -j,--parallel <num>                           Use <num> threads to compress in parallel
-#                                                (default: $(nproc --all))
-#  -o,--out-dir <dir>                            copy cpack'd TGZ file into <dir>
+#  -o,--out-dir <dir>                            copy cpack'd tar.zstd file into <dir>
 #                                                (default: none)
 # @_include_value_options rapids-select-cmake-install-args -h | tail -n-5 | head -n-2;
 
@@ -24,7 +22,6 @@ cpack_${CPP_LIB}_cpp() {
     set -euo pipefail;
 
     eval "$(_parse_args --take '
-        -j,--parallel
         -o,--out-dir
         --component
     ' "$@" ${CPP_CPACK_ARGS} <&0)";
@@ -32,11 +29,6 @@ cpack_${CPP_LIB}_cpp() {
     if ! test -f "${CPP_SRC}/${BIN_DIR}/CMakeCache.txt"; then
         exit 0;
     fi
-
-    eval "$(                                              \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)}      \
-        rapids-get-num-archs-jobs-and-load --archs 0 "$@" \
-    )";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'cpack-all cpack-${NAME} cpack-${CPP_LIB}-cpp';
@@ -104,8 +96,8 @@ cpack_${CPP_LIB}_cpp() {
             fi
 
             if test -d "${outd}/${slug}"; then
-                tar -C "${outd}" -c ${v:+-v} -f "${outd}/${slug}.tar.gz" -I "pigz -p ${n_jobs}" "${slug}";
-                cp -a "${outd}/${slug}.tar.gz" "${CPP_SRC}/${BIN_DIR}/";
+                tar -C "${outd}" -c ${v:+-v} -f "${outd}/${slug}.tar.zstd" -I "zstd -${ZSTD_COMPRESSION_LEVEL:-16}" "${slug}";
+                cp -a "${outd}/${slug}.tar.zstd" "${CPP_SRC}/${BIN_DIR}/";
 
                 if ! test -n "${out_dir:+x}" || test "${#out_dir[@]}" -eq 0; then
                     continue;
@@ -117,7 +109,7 @@ cpack_${CPP_LIB}_cpp() {
 
                 if test -n "${outd:+x}"; then
                     mkdir -p "${outd}/";
-                    cp -a "${CPP_SRC}/${BIN_DIR}/${slug}.tar.gz" "${outd}/";
+                    cp -a "${CPP_SRC}/${BIN_DIR}/${slug}.tar.zstd" "${outd}/";
                 fi
             fi
         done

@@ -186,11 +186,19 @@ make_pip_env() {
     local -r new_env_path="$(realpath -m "/tmp/${env_file_name}")";
     local -r old_env_path="$(realpath -m "${HOME}/.local/share/venvs/${env_file_name}")";
 
+    # Check for constraints file and add it as a requirement if it exists
+    local constraints_file="${HOME}/.requirements/constraints.txt";
+    local -a constraints_args=();
+    if [ -f "$constraints_file" ]; then
+        echo "Found constraints file: $constraints_file" 1>&2;
+        constraints_args=(-r "$constraints_file");
+    fi
+
     # Create the python env without ninja.
     # ninja -$(ulimit -n) fails with `ninja: FATAL: pipe: Too many open files`.
     # This appears to have been fixed 13 years ago (https://github.com/ninja-build/ninja/issues/233),
     # so that fix needs to be integrated into the kitware pip ninja builds.
-    rapids-make-pip-dependencies --exclude <(echo ninja) "${OPTS[@]}" | consolidate_constraints > "${new_env_path}";
+    rapids-make-pip-dependencies --exclude <(echo ninja) "${OPTS[@]}" "${constraints_args[@]}" | consolidate_constraints > "${new_env_path}";
 
     if test -f "${new_env_path}"; then
 

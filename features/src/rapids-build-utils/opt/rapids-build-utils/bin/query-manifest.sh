@@ -27,6 +27,10 @@ query_manifest() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'query-manifest';
 
     local manifest="${m:-${manifest:-"${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"}"}}";
+    if ! test -f "${manifest}"; then
+        echo "Error: Manifest file not found: ${manifest}" >&2;
+        exit 1;
+    fi
 
     local query=;
 
