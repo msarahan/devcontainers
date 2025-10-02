@@ -34,7 +34,7 @@ build_${NAME}() {
 
     for lib in ${PY_LIB}; do
         if command -V build-${lib}-python >/dev/null 2>&1; then
-            build-${lib}-python-${t:-${type:-"editable"}} "${OPTS[@]}";
+            build-${lib}-python-${t:-${type:-"editable"}} "${OPTS[@]}" ${no_install:+--no-install=true};
         fi
     done
 }
