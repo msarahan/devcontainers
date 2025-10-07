@@ -33,7 +33,7 @@ gitlab_cli_file_name() {
 download_gitlab_cli_deb() {
     local -;
     set -euo pipefail;
-    wget -O -v /tmp/gitlab-cli.deb \
+    wget -O -v --no-check-certificate /tmp/gitlab-cli.deb \
         "https://gitlab.com/gitlab-org/cli/-/releases/v${CLI_VERSION}/downloads/$(gitlab_cli_file_name)";
 }
 
