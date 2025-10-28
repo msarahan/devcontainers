@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "Modern Python CLI for building and managing RAPIDS projects"
 readme = "README.md"
 requires-python = ">=3.8"
-license = "Apache-2.0"
+license = { text = "Apache-2.0" }
 authors = [
     {name = "RAPIDS Team"},
 ]
