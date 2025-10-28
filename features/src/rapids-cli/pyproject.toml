@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rapids-cli"
+version = "1.0.0"
+description = "Modern Python CLI for building and managing RAPIDS projects"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "Apache-2.0"
+authors = [
+    {name = "RAPIDS Team"},
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "pyyaml>=5.4",
+]
+
+[project.scripts]
+rapids = "rapids_cli:main"
+
+[project.urls]
+Homepage = "https://github.com/rapidsai/devcontainers"
+Documentation = "https://github.com/rapidsai/devcontainers"
+Repository = "https://github.com/rapidsai/devcontainers"
+
+[tool.setuptools]
+py-modules = ["rapids_cli", "rapids_build_system"]
+
+[tool.setuptools.package-data]
+"*" = ["*.bash"]
+

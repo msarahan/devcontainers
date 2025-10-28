@@ -1,0 +1,4 @@
+include README.md
+include bin/rapids-completion.bash
+recursive-include bin *.py
+

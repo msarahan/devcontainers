@@ -1,3 +1,25 @@
+Metadata-Version: 2.4
+Name: rapids-cli
+Version: 1.0.0
+Summary: Modern Python CLI for building and managing RAPIDS projects
+Author: RAPIDS Team
+License-Expression: Apache-2.0
+Project-URL: Homepage, https://github.com/rapidsai/devcontainers
+Project-URL: Documentation, https://github.com/rapidsai/devcontainers
+Project-URL: Repository, https://github.com/rapidsai/devcontainers
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: pyyaml>=5.4
+
 # RAPIDS CLI - Pure Python Build System
 
 ## Overview
