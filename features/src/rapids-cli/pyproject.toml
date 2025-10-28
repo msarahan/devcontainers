@@ -29,6 +29,7 @@ dependencies = [
 
 [project.scripts]
 rapids = "rapids_cli:main"
+rapids-parse-args = "parse_args:main"
 
 [project.urls]
 Homepage = "https://github.com/rapidsai/devcontainers"
@@ -36,7 +37,7 @@ Documentation = "https://github.com/rapidsai/devcontainers"
 Repository = "https://github.com/rapidsai/devcontainers"
 
 [tool.setuptools]
-py-modules = ["rapids_cli", "rapids_build_system"]
+py-modules = ["rapids_cli", "rapids_build_system", "parse_args"]
 
 [tool.setuptools.package-data]
 "*" = ["*.bash"]
