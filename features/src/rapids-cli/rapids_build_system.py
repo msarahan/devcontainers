@@ -236,16 +236,49 @@ class GitOperations:
                 print(f"{self.project.name} already cloned")
                 return 0
         
-        # Build clone URL
+        # Build clone URL with authentication
         git_info = self.project.git
         host = git_info.get('host', 'github')
         upstream = git_info.get('upstream', 'rapidsai')
         repo = git_info.get('repo', self.project.name)
         
+        # Determine the base host and construct URL
         if host == 'github':
-            url = f"https://github.com/{upstream}/{repo}.git"
+            base_host = 'github.com'
+        elif host == 'gitlab':
+            base_host = 'gitlab-master.nvidia.com'
         else:
-            url = f"https://{host}/{upstream}/{repo}.git"
+            base_host = host
+        
+        # Get authentication token based on host
+        token = None
+        if base_host == 'github.com':
+            # Try GITHUB_TOKEN first, then GH_TOKEN
+            token = os.environ.get('GITHUB_TOKEN') or os.environ.get('GH_TOKEN')
+        elif 'gitlab' in base_host.lower():
+            # For GitLab hosts (gitlab-master.nvidia.com, etc.)
+            token = os.environ.get('GITLAB_TOKEN')
+        
+        # Construct URL with or without token
+        if token:
+            # Inject token into URL: https://token@host/upstream/repo.git
+            # For GitHub, use token as username; for GitLab, token goes directly
+            if base_host == 'github.com':
+                # GitHub uses token as username with 'x-oauth-basic' as password (but token alone works too)
+                url = f"https://{token}@{base_host}/{upstream}/{repo}.git"
+            else:
+                # GitLab uses 'oauth2' as username with token as password, but token alone also works
+                url = f"https://oauth2:{token}@{base_host}/{upstream}/{repo}.git"
+            
+            if args.get('verbose'):
+                # Print URL with masked token for security
+                masked_url = url.replace(token, '***')
+                print(f"Using authenticated URL: {masked_url}")
+        else:
+            # No token available, use public URL
+            url = f"https://{base_host}/{upstream}/{repo}.git"
+            if args.get('verbose'):
+                print(f"No authentication token found, using public URL: {url}")
         
         cmd = ['git', 'clone']
         
@@ -263,7 +296,9 @@ class GitOperations:
         
         print(f"Cloning {self.project.name}...")
         if args.get('verbose'):
-            print(f"Command: {' '.join(cmd)}")
+            # Mask token in command output for security
+            safe_cmd = [c.replace(token, '***') if token and token in c else c for c in cmd]
+            print(f"Command: {' '.join(safe_cmd)}")
         
         result = subprocess.run(cmd)
         return result.returncode
