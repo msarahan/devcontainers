@@ -226,8 +226,32 @@ class PythonBuilder:
 class GitOperations:
     """Handles git operations"""
     
+    # Host alias mapping - resolves short names to full hostnames
+    HOST_ALIASES = {
+        'github': 'github.com',
+        'gitlab': 'gitlab-master.nvidia.com',
+    }
+    
     def __init__(self, project: Project):
         self.project = project
+    
+    @classmethod
+    def resolve_host(cls, host_alias: str) -> str:
+        """
+        Resolve a host alias to a full hostname.
+        
+        Args:
+            host_alias: Short host name (e.g., 'github', 'gitlab') or full URL
+        
+        Returns:
+            Full hostname (e.g., 'github.com', 'gitlab-master.nvidia.com')
+        """
+        # If it's already a full hostname (contains a dot), return as-is
+        if '.' in host_alias:
+            return host_alias
+        
+        # Otherwise, look up in alias mapping
+        return cls.HOST_ALIASES.get(host_alias, host_alias)
     
     def clone(self, args: Dict[str, Any]) -> int:
         """Clone repository"""
@@ -242,13 +266,8 @@ class GitOperations:
         upstream = git_info.get('upstream', 'rapidsai')
         repo = git_info.get('repo', self.project.name)
         
-        # Determine the base host and construct URL
-        if host == 'github':
-            base_host = 'github.com'
-        elif host == 'gitlab':
-            base_host = 'gitlab-master.nvidia.com'
-        else:
-            base_host = host
+        # Resolve host alias to full hostname
+        base_host = self.resolve_host(host)
         
         # Get authentication token based on host
         token = None
