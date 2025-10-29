@@ -1,5 +1,6 @@
 MANIFEST.in
 README.md
+parse_args.py
 pyproject.toml
 rapids_build_system.py
 rapids_cli.py

@@ -3,7 +3,7 @@ Name: rapids-cli
 Version: 1.0.0
 Summary: Modern Python CLI for building and managing RAPIDS projects
 Author: RAPIDS Team
-License-Expression: Apache-2.0
+License: Apache-2.0
 Project-URL: Homepage, https://github.com/rapidsai/devcontainers
 Project-URL: Documentation, https://github.com/rapidsai/devcontainers
 Project-URL: Repository, https://github.com/rapidsai/devcontainers

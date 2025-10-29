@@ -67,11 +67,20 @@ class RapidsCLI:
     """Main CLI interface"""
     
     def __init__(self):
-        self.manifest_path = get_manifest_path()
-        self.manifest = ManifestLoader(self.manifest_path)
-        self.orchestrator = BuildOrchestrator(self.manifest)
-        self.projects = self.manifest.get_projects()
-        self.project_names = [p.name for p in self.projects]
+        self.manifest_path = None
+        self.manifest = None
+        self.orchestrator = None
+        self.projects = []
+        self.project_names = []
+    
+    def _load_manifest(self):
+        """Load manifest lazily when needed"""
+        if self.manifest is None:
+            self.manifest_path = get_manifest_path()
+            self.manifest = ManifestLoader(self.manifest_path)
+            self.orchestrator = BuildOrchestrator(self.manifest)
+            self.projects = self.manifest.get_projects()
+            self.project_names = [p.name for p in self.projects]
     
     def create_parser(self) -> argparse.ArgumentParser:
         """Create the main argument parser"""
@@ -88,8 +97,7 @@ class RapidsCLI:
             'project',
             nargs='?',
             default='all',
-            choices=self.project_names + ['all', 'all-cpp', 'all-python'],
-            help='Project to build'
+            help='Project to build (or "all", "all-cpp", "all-python")'
         )
         self._add_build_args(build_parser)
         
@@ -99,8 +107,7 @@ class RapidsCLI:
             'project',
             nargs='?',
             default='all',
-            choices=self.project_names + ['all'],
-            help='Project to configure'
+            help='Project to configure (or "all")'
         )
         self._add_configure_args(configure_parser)
         
@@ -110,8 +117,7 @@ class RapidsCLI:
             'project',
             nargs='?',
             default='all',
-            choices=self.project_names + ['all'],
-            help='Project to clean'
+            help='Project to clean (or "all")'
         )
         self._add_clean_args(clean_parser)
         
@@ -121,8 +127,7 @@ class RapidsCLI:
             'project',
             nargs='?',
             default='all',
-            choices=self.project_names + ['all'],
-            help='Project to clone'
+            help='Project to clone (or "all" for all projects)'
         )
         self._add_clone_args(clone_parser)
         
@@ -132,8 +137,7 @@ class RapidsCLI:
             'project',
             nargs='?',
             default='all',
-            choices=self.project_names + ['all'],
-            help='Project to install'
+            help='Project to install (or "all")'
         )
         self._add_install_args(install_parser)
         
@@ -146,7 +150,7 @@ class RapidsCLI:
         
         # Info command
         info_parser = subparsers.add_parser('info', help='Show project information')
-        info_parser.add_argument('project', choices=self.project_names, help='Project name')
+        info_parser.add_argument('project', help='Project name')
         info_parser.add_argument('--json', action='store_true', help='Output as JSON')
         
         return parser
@@ -179,6 +183,9 @@ class RapidsCLI:
     
     def _add_clone_args(self, parser: argparse.ArgumentParser):
         """Add clone command arguments"""
+        parser.add_argument('-j', '--parallel', type=int, metavar='N', 
+                          default=1,
+                          help='Number of parallel clone jobs (default: 1)')
         parser.add_argument('-v', '--verbose', action='store_true', help='Verbose output')
         parser.add_argument('-q', '--quiet', action='store_true', help='Quiet output')
         parser.add_argument('--depth', type=int, metavar='N', help='Shallow clone depth')
@@ -194,6 +201,8 @@ class RapidsCLI:
     
     def cmd_build(self, args: argparse.Namespace) -> int:
         """Handle build command"""
+        self._load_manifest()
+        
         build_args = {
             'parallel': args.parallel or int(os.environ.get('RAPIDS_JOBS', os.cpu_count() or 1)),
             'verbose': args.verbose,
@@ -228,6 +237,8 @@ class RapidsCLI:
     
     def cmd_configure(self, args: argparse.Namespace) -> int:
         """Handle configure command"""
+        self._load_manifest()
+        
         config_args = {
             'verbose': args.verbose,
             'clean': args.clean,
@@ -247,6 +258,8 @@ class RapidsCLI:
     
     def cmd_clean(self, args: argparse.Namespace) -> int:
         """Handle clean command"""
+        self._load_manifest()
+        
         clean_args = {'verbose': args.verbose}
         
         if args.project == 'all':
@@ -260,7 +273,10 @@ class RapidsCLI:
     
     def cmd_clone(self, args: argparse.Namespace) -> int:
         """Handle clone command"""
+        self._load_manifest()
+        
         clone_args = {
+            'parallel': args.parallel,
             'verbose': args.verbose,
             'quiet': args.quiet,
             'depth': args.depth,
@@ -277,6 +293,8 @@ class RapidsCLI:
     
     def cmd_install(self, args: argparse.Namespace) -> int:
         """Handle install command"""
+        self._load_manifest()
+        
         # For now, just call build with --install
         build_args = argparse.Namespace(
             project=args.project,
@@ -297,6 +315,8 @@ class RapidsCLI:
     
     def cmd_list(self, args: argparse.Namespace) -> int:
         """Handle list command"""
+        self._load_manifest()
+        
         if args.json:
             data = {
                 'projects': [],
@@ -341,6 +361,8 @@ class RapidsCLI:
     
     def cmd_info(self, args: argparse.Namespace) -> int:
         """Handle info command"""
+        self._load_manifest()
+        
         project = self.manifest.get_project(args.project)
         if not project:
             print(f"Error: Unknown project: {args.project}", file=sys.stderr)

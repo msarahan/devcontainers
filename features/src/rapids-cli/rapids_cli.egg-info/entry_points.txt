@@ -1,2 +1,3 @@
 [console_scripts]
 rapids = rapids_cli:main
+rapids-parse-args = parse_args:main

@@ -1,2 +1,3 @@
+parse_args
 rapids_build_system
 rapids_cli
